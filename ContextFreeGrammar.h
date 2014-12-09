@@ -30,9 +30,14 @@ public:
     std::string getStartStr() const;
     
     bool isTerminalStr(const std::string &) const;
-    //从文件读取
-    void getFileLine(const std::string &fileName);
+	void clearLeftRecursion() ;
 
+	void getLine(const std::string &);
+
+    //从文件读取
+    void getFileLine(const std::string &);
+
+	
 
 private:
     std::string startStr;
