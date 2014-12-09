@@ -36,8 +36,8 @@ bool ContextFreeGrammar::isTerminalStr(const std::string &tempStr) const{
 
 void ContextFreeGrammar::clearLeftRecursion() {
 	std::string clrProduction;
-	std::string a; 
-	std::vector<std::string> b;  //用于消除左递归的中间变量
+	std::string a_temp; 
+	std::vector<std::string> a,b;  //用于消除左递归的中间变量
 
 	int i;
 	bool flog; //用来判断当前非终极符是否存在左递归的情况，true表示存在，否则不存在
@@ -49,9 +49,11 @@ void ContextFreeGrammar::clearLeftRecursion() {
 				flog=true;
 				i=1;
 				while(i<(*ptr1).length()){
-					a.push_back((*ptr1)[i]);
+					a_temp.push_back((*ptr1)[i]);
 					i++;
 				}
+				a.push_back(a_temp);
+				a_temp.clear();
 			}
 			else{
 				b.push_back(*ptr1);
@@ -72,15 +74,18 @@ void ContextFreeGrammar::clearLeftRecursion() {
 			clrProduction.push_back('\'');
 			clrProduction.push_back('-');
 			clrProduction.push_back('>');
-			i=0;
-			while(i<a.length()){
-				clrProduction.push_back(a[i]);
-				i++;
+			for(auto ptr2 = a.begin(); ptr2 != a.end();++ptr2) {
+				i=0;
+				while(i<(*ptr2).length()){
+					clrProduction.push_back((*ptr2)[i]);
+					i++;
+				}
+				clrProduction.push_back((*ptr)[0]);
+				clrProduction.push_back('\'');
+				clrProduction.push_back('|');
 			}
-			clrProduction.push_back((*ptr)[0]);
-			clrProduction.push_back('\'');
-			clrProduction.push_back('|');
 			clrProduction.push_back('$');
+			std::cout<<clrProduction<<std::endl;
 			getLine(clrProduction);
 			clrProduction.clear();
 		}
@@ -166,4 +171,3 @@ void ContextFreeGrammar::getLine(const std::string &raw_Production){
     rawProduction.clear();
     
 }
-
