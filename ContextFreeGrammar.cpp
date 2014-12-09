@@ -85,7 +85,6 @@ void ContextFreeGrammar::clearLeftRecursion() {
 				clrProduction.push_back('|');
 			}
 			clrProduction.push_back('$');
-			std::cout<<clrProduction<<std::endl;
 			getLine(clrProduction);
 			clrProduction.clear();
 		}
@@ -94,6 +93,70 @@ void ContextFreeGrammar::clearLeftRecursion() {
 		b.clear();
     }
 
+}
+
+void ContextFreeGrammar::pickPublicLeftFactor(){
+	char publicLeftFactor;
+	std::string pplfProduction;
+	std::string a_temp; 
+	std::vector<std::string> a,b;  //用于消除左递归的中间变量
+
+	int i;
+	int count; //用来记录总共有几个项含有公共左因子
+
+	for (auto ptr = nterminalStr.cbegin(); ptr!=nterminalStr.cend(); ++ptr) {
+		count=0;
+		publicLeftFactor=(*production.at(*ptr).begin())[0];
+        for (auto ptr1 = production.at(*ptr).begin(); ptr1 != production.at(*ptr).end();++ptr1) {
+			if( (*ptr1)[0] == publicLeftFactor ){
+				count++;
+				i=1;
+				while(i<(*ptr1).length()){
+					a_temp.push_back((*ptr1)[i]);
+					i++;
+				}
+				a.push_back(a_temp);
+				a_temp.clear();
+			}
+			else{
+				b.push_back(*ptr1);
+			}
+			
+		}
+
+		//提取公共左因子
+		if(count>1) {
+			production.at(*ptr).clear();
+			a_temp.push_back(publicLeftFactor);
+			a_temp.push_back((*ptr)[0]);
+			a_temp.push_back('\'');
+			production.at(*ptr).push_back(a_temp);
+			for(auto ptr2 = b.begin(); ptr2 != b.end();++ptr2) {
+				production[*ptr].push_back(*ptr2);
+			}
+
+			pplfProduction.push_back((*ptr)[0]);
+			pplfProduction.push_back('\'');
+			pplfProduction.push_back('-');
+			pplfProduction.push_back('>');
+			for(auto ptr2 = a.begin(); ptr2 != a.end();++ptr2) {
+				i=0;
+				while(i<(*ptr2).length()){
+					pplfProduction.push_back((*ptr2)[i]);
+					i++;
+				}
+				if(ptr2+1!=a.end())
+				{
+					pplfProduction.push_back('|');
+				}
+			}
+			getLine(pplfProduction);
+			pplfProduction.clear();
+		}
+		
+		a.clear();
+		b.clear();
+    }
 }
 
 void ContextFreeGrammar::getFileLine(const std::string &fileName){

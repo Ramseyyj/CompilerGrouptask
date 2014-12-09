@@ -31,6 +31,7 @@ public:
     
     bool isTerminalStr(const std::string &) const;
 	void clearLeftRecursion() ;
+	void ContextFreeGrammar::pickPublicLeftFactor();
 
 	void getLine(const std::string &);
 
