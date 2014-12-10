@@ -47,6 +47,7 @@ int main()
 	test_nterminalStr = test_ContextFreeGrammar.getAllNTerminalStr();
     test_terminalStr = test_ContextFreeGrammar.getAllTerminalStr();
 
+	cout<<"输入的文法如下："<<endl;
 	 //printStr是非类库中的函数，我是在这个文件中自己定义的一个，1代表输出非终结符，0代表终结符
     //见此文件的顶部
     printStr(test_nterminalStr, 1);
@@ -57,6 +58,8 @@ int main()
     }
 
 	//测试提取公共左因子的程序
+    /*
+	cout<<"提取公共左因子后的文法如下："<<endl;
 	test_ContextFreeGrammar.pickPublicLeftFactor();
     test_nterminalStr = test_ContextFreeGrammar.getAllNTerminalStr();
     test_terminalStr = test_ContextFreeGrammar.getAllTerminalStr();
@@ -65,10 +68,10 @@ int main()
 
 	for( auto ptr = test_nterminalStr.cbegin(); ptr!=test_nterminalStr.cend(); ++ptr) {
         printProdcution(*ptr,test_ContextFreeGrammar.getProductionRhStr(*ptr));
-    }
+    }*/
 
 	//测试消除左递归的程序
-	
+	cout<<"消除左递归后的文法如下："<<endl;
 	test_ContextFreeGrammar.clearLeftRecursion();
     test_nterminalStr = test_ContextFreeGrammar.getAllNTerminalStr();
     test_terminalStr = test_ContextFreeGrammar.getAllTerminalStr();

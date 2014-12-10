@@ -66,7 +66,7 @@ void ContextFreeGrammar::clearLeftRecursion() {
         for (auto ptr1 = production.at(*ptr).begin(); ptr1 != production.at(*ptr).end();++ptr1) {
 			if(isLeftRecursion(*ptr,*ptr1)){
  				flog=true;
-				i=1;
+				i=(*ptr).length();
 				while(i<(*ptr1).length()){
 					a_temp.push_back((*ptr1)[i]);
 					i++;
@@ -84,12 +84,20 @@ void ContextFreeGrammar::clearLeftRecursion() {
 		if(flog) {
 			production.at(*ptr).clear();
 			for(auto ptr2 = b.begin(); ptr2 != b.end();++ptr2) {
-				(*ptr2).push_back((*ptr)[0]);
+				i=0;
+				while(i<(*ptr).length()){
+					(*ptr2).push_back((*ptr)[i]);
+					i++;
+				}
 				(*ptr2).push_back('\'');
 				production[*ptr].push_back(*ptr2);
 			}
 
-			clrProduction.push_back((*ptr)[0]);
+			i=0;
+			while(i<(*ptr).length()){
+				clrProduction.push_back((*ptr)[i]);
+				i++;
+			}
 			clrProduction.push_back('\'');
 			clrProduction.push_back('-');
 			clrProduction.push_back('>');
@@ -99,7 +107,11 @@ void ContextFreeGrammar::clearLeftRecursion() {
 					clrProduction.push_back((*ptr2)[i]);
 					i++;
 				}
-				clrProduction.push_back((*ptr)[0]);
+				i=0;
+				while(i<(*ptr).length()){
+					clrProduction.push_back((*ptr)[i]);
+					i++;
+				}
 				clrProduction.push_back('\'');
 				clrProduction.push_back('|');
 			}
@@ -147,14 +159,22 @@ void ContextFreeGrammar::pickPublicLeftFactor(){
 		if(count>1) {
 			production.at(*ptr).clear();
 			a_temp.push_back(publicLeftFactor);
-			a_temp.push_back((*ptr)[0]);
+			i=0;
+			while(i<(*ptr).length()){
+				a_temp.push_back((*ptr)[i]);
+				i++;
+			}
 			a_temp.push_back('^');
 			production.at(*ptr).push_back(a_temp);
 			for(auto ptr2 = b.begin(); ptr2 != b.end();++ptr2) {
 				production[*ptr].push_back(*ptr2);
 			}
 
-			pplfProduction.push_back((*ptr)[0]);
+			i=0;
+			while(i<(*ptr).length()){
+				pplfProduction.push_back((*ptr)[i]);
+				i++;
+			}
 			pplfProduction.push_back('^');
 			pplfProduction.push_back('-');
 			pplfProduction.push_back('>');
@@ -210,8 +230,9 @@ void ContextFreeGrammar::getLine(const std::string &raw_Production){
     rawProduction.erase(std::remove_if(rawProduction.begin(),
                             rawProduction.end(), ::isspace), rawProduction.end());
     
-	std::cout<<"haha"<<rawProduction<<std::endl;
+	//std::cout<<"haha"<<rawProduction<<std::endl;
     int i = 0;
+	int j;
 	while (rawProduction[i]!='-') {
 		lhProduction.push_back(rawProduction[i++]);
 	}
@@ -230,21 +251,25 @@ void ContextFreeGrammar::getLine(const std::string &raw_Production){
 			i++;
 		}
 		else{
+			j=0;
 			if ((rawProduction[i]!='\'')&&(rawProduction[i]!='^')) {//handle char(')and(^)
-				if ((rawProduction[i+1] == '\'')||(rawProduction[i+1] == '^')) {
+                while ((rawProduction[i+1] == '\'')||(rawProduction[i+1] == '^')) {
 					mterminalStr.push_back(rawProduction[i]);
-					mterminalStr.push_back(rawProduction[i+1]);
+					i++;j++;
 				}
-				else {
-					mterminalStr.push_back(rawProduction[i]);
-				}
-                    
+				mterminalStr.push_back(rawProduction[i]);
+
+
 				if (nterminalStr.find(mterminalStr)==nterminalStr.end()){
 					addTerminalStr(mterminalStr);
 				}
 				mterminalStr.clear();
 			}
-			rhProduction.push_back(rawProduction[i++]);
+			i=i-j;//进行回溯，让i回到出来'和^之前的位置
+			while(j>=0){
+				rhProduction.push_back(rawProduction[i++]);
+				j--;
+			}
 		}
 	}
     
