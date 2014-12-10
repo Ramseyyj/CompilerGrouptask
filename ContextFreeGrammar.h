@@ -30,7 +30,10 @@ public:
     std::string getStartStr() const;
     
     bool isTerminalStr(const std::string &) const;
-	void clearLeftRecursion() ;
+
+	//判断一个产生式中是否含有左递归的函数
+	bool isLeftRecursion(const std::string &, const std::string &) const;
+	void clearLeftRecursion();
 	void ContextFreeGrammar::pickPublicLeftFactor();
 
 	void getLine(const std::string &);

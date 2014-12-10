@@ -34,6 +34,25 @@ bool ContextFreeGrammar::isTerminalStr(const std::string &tempStr) const{
     return true;
 }
 
+bool ContextFreeGrammar::isLeftRecursion(const std::string &lhProduction,const std::string &rhProduction) const{
+	int i=0;
+	while(i<lhProduction.length()){
+		if(lhProduction[i] == rhProduction[i])
+			i++;
+		else
+			return false;
+	}
+	if(i==lhProduction.length())
+	{
+		if( (rhProduction[i]!='\'') && (rhProduction[i]!='^') ) 
+			return true;
+		else
+			return false;
+	}
+	else
+		return false;
+}
+
 void ContextFreeGrammar::clearLeftRecursion() {
 	std::string clrProduction;
 	std::string a_temp; 
@@ -45,8 +64,8 @@ void ContextFreeGrammar::clearLeftRecursion() {
 	for (auto ptr = nterminalStr.cbegin(); ptr!=nterminalStr.cend(); ++ptr) {
 		flog=false;
         for (auto ptr1 = production.at(*ptr).begin(); ptr1 != production.at(*ptr).end();++ptr1) {
-			if((*ptr)[0] == (*ptr1)[0]){
-				flog=true;
+			if(isLeftRecursion(*ptr,*ptr1)){
+ 				flog=true;
 				i=1;
 				while(i<(*ptr1).length()){
 					a_temp.push_back((*ptr1)[i]);
@@ -129,14 +148,14 @@ void ContextFreeGrammar::pickPublicLeftFactor(){
 			production.at(*ptr).clear();
 			a_temp.push_back(publicLeftFactor);
 			a_temp.push_back((*ptr)[0]);
-			a_temp.push_back('\'');
+			a_temp.push_back('^');
 			production.at(*ptr).push_back(a_temp);
 			for(auto ptr2 = b.begin(); ptr2 != b.end();++ptr2) {
 				production[*ptr].push_back(*ptr2);
 			}
 
 			pplfProduction.push_back((*ptr)[0]);
-			pplfProduction.push_back('\'');
+			pplfProduction.push_back('^');
 			pplfProduction.push_back('-');
 			pplfProduction.push_back('>');
 			for(auto ptr2 = a.begin(); ptr2 != a.end();++ptr2) {
@@ -190,9 +209,9 @@ void ContextFreeGrammar::getLine(const std::string &raw_Production){
     //erase space
     rawProduction.erase(std::remove_if(rawProduction.begin(),
                             rawProduction.end(), ::isspace), rawProduction.end());
-        
-    int i = 0;
     
+	std::cout<<"haha"<<rawProduction<<std::endl;
+    int i = 0;
 	while (rawProduction[i]!='-') {
 		lhProduction.push_back(rawProduction[i++]);
 	}
@@ -211,8 +230,8 @@ void ContextFreeGrammar::getLine(const std::string &raw_Production){
 			i++;
 		}
 		else{
-			if (rawProduction[i]!='\'') {//handle char(')
-				if (rawProduction[i+1] == '\'') {
+			if ((rawProduction[i]!='\'')&&(rawProduction[i]!='^')) {//handle char(')and(^)
+				if ((rawProduction[i+1] == '\'')||(rawProduction[i+1] == '^')) {
 					mterminalStr.push_back(rawProduction[i]);
 					mterminalStr.push_back(rawProduction[i+1]);
 				}

@@ -68,7 +68,7 @@ int main()
     }
 
 	//²âÊÔÏû³ý×óµÝ¹éµÄ³ÌÐò
-	/*
+	
 	test_ContextFreeGrammar.clearLeftRecursion();
     test_nterminalStr = test_ContextFreeGrammar.getAllNTerminalStr();
     test_terminalStr = test_ContextFreeGrammar.getAllTerminalStr();
@@ -77,7 +77,7 @@ int main()
 
 	for( auto ptr = test_nterminalStr.cbegin(); ptr!=test_nterminalStr.cend(); ++ptr) {
         printProdcution(*ptr,test_ContextFreeGrammar.getProductionRhStr(*ptr));
-    }*/
+    }
 	
 	return 0;
 }
