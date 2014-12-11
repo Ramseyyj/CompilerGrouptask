@@ -41,7 +41,8 @@ int main()
     unordered_set<string> test_nterminalStr;
     
     
-    test_ContextFreeGrammar.getFileLine("F:\\programming\\compiler\\CompilerGrouptask\\CompilerGrouptask\\test_ContextFreeGrammar4.3.txt");
+    test_ContextFreeGrammar.getFileLine("F:\\programming\\compiler\\CompilerGrouptask\\CompilerGrouptask\\test_ContextFreeGrammar4.2.txt");
+	//test_ContextFreeGrammar.simplify();
 	test_nterminalStr = test_ContextFreeGrammar.getAllNTerminalStr();
     test_terminalStr = test_ContextFreeGrammar.getAllTerminalStr();
 

@@ -137,7 +137,6 @@ void ContextFreeGrammar::clearAllLeftRecursion(){
 	bool flog;
 	std::string mterminalStr;//just one terminal or nterminal
 	std::string tempStr;
-	std::string a;//存储产生式右侧项中将要被替换的非终极符的前部分
 	std::string b;//存储产生式右侧项中将要被替换的非终极符的后部分
 
 
@@ -152,44 +151,34 @@ void ContextFreeGrammar::clearAllLeftRecursion(){
 				//遍历ptri指向非终极符的产生式右侧每一项，用ptrj指向非终极符的产生式右侧每一项进行代入操作
 				for (auto ptr =production.at(*ptri).begin();ptr!=production.at(*ptri).end();++ptr){
 					i=0;j=0;
-					while(i<(*ptr).length()){
-						if( ((*ptr)[i]!='\'')&&((*ptr)[i]!='^') ){//在ptri对应非终极符的产生式右侧寻找可替代项
-							while( ((*ptr)[i+1]=='\'')||((*ptr)[i+1]=='^') ){
-								mterminalStr.push_back((*ptr)[i]);
-								i++;j++;
-							}
-							mterminalStr.push_back((*ptr)[i]);		
-							for(auto k =0;k<i-j;++k){
-								a.push_back((*ptr)[k]);
-							}
-							for(auto k=i+1;k<(*ptr).length();++k){
-								b.push_back((*ptr)[k]);
-							}
-						}
-						if(mterminalStr == *ptrj){//找到可替代项，进行替代
-							production.at(*ptri).erase(ptr);
-							for(auto ptr1 =production.at(*ptrj).begin();ptr1!=production.at(*ptrj).end();++ptr1){
-								for(auto k =0;k<a.length();++k){//把前部分压入临时字符串
-									tempStr.push_back(a[k]);
-								}
-								for(auto k =0;k<(*ptr1).length();++k){//把要替换非终极符的项压入临时字符串
-									tempStr.push_back((*ptr1)[k]);
-								}
-								for(auto k =0;k<b.length();++k){//把后部分压入临时字符串
-									tempStr.push_back(b[k]);
-								}
-								tempVector.push_back(tempStr);//把替换完成后的临时字符串压入被替换的产生式作为一个项
-								flog=true;
-								tempStr.clear();
-							}
-							break;
-						}
-						i++;
-						mterminalStr.clear();
-						a.clear();
-						b.clear();
+					//在ptri对应非终极符的产生式右侧寻找可替代项
+					while( ((*ptr)[i+1]=='\'')||((*ptr)[i+1]=='^') ){
+						mterminalStr.push_back((*ptr)[i]);
+						i++;j++;
 					}
-					if(flog)
+					mterminalStr.push_back((*ptr)[i]);		
+					for(auto k=i+1;k<(*ptr).length();++k){
+						b.push_back((*ptr)[k]);
+					}
+					if(mterminalStr == *ptrj){//找到可替代项，进行替代
+						production.at(*ptri).erase(ptr);
+						for(auto ptr1 =production.at(*ptrj).begin();ptr1!=production.at(*ptrj).end();++ptr1){
+							for(auto k =0;k<(*ptr1).length();++k){//把要替换非终极符的项压入临时字符串
+								tempStr.push_back((*ptr1)[k]);
+							}
+							for(auto k =0;k<b.length();++k){//把后部分压入临时字符串
+								tempStr.push_back(b[k]);
+							}
+							tempVector.push_back(tempStr);//把替换完成后的临时字符串压入被替换的产生式作为一个项
+							flog=true;
+							tempStr.clear();
+						}
+						break;
+					}
+					i++;
+					mterminalStr.clear();
+					b.clear();
+			    	if(flog)
 						break;
 				}
 				for(auto ptr=tempVector.begin();ptr!=tempVector.end();++ptr){
@@ -272,6 +261,48 @@ void ContextFreeGrammar::pickPublicLeftFactor(){
 		a.clear();
 		b.clear();
     }
+}
+
+void ContextFreeGrammar::simplify(){
+	std::string mterminalStr;
+	int i;
+	bool flog;//用于记录当前非终极符是否多余，如果是值为true，否则为false
+	bool isDelete=true;//用于记录一次循环中有没有删除非终极符，如果删除了值为true,否则为false
+
+	while(isDelete){
+		isDelete=false;
+		for (auto ptri= nterminalStr.begin();ptri!=nterminalStr.end();++ptri){
+			flog=true;
+			for(auto ptrj=nterminalStr.cbegin();ptrj!=nterminalStr.cend();++ptrj){
+				for (auto ptr=production.at(*ptrj).begin();ptr!=production.at(*ptrj).end();++ptr){
+					i=0;
+					while(i<(*ptr).length()){
+						if( ((*ptr)[i]!='\'')&&((*ptr)[i]!='^') ){//在ptri对应非终极符的产生式右侧寻找可替代项
+							while( ((*ptr)[i+1]=='\'')||((*ptr)[i+1]=='^') ){
+								mterminalStr.push_back((*ptr)[i]);
+								i++;
+							}
+							mterminalStr.push_back((*ptr)[i]);	
+						}
+						if(mterminalStr == *ptri){
+							flog=false;
+							break;
+						}
+						i++;
+					}
+					if(!flog)
+						break;
+				}
+				if(!flog)
+					break;
+			}
+			if(flog && (*ptri)!=getStartStr()){
+				nterminalStr.erase(ptri);
+				isDelete=true;
+				break;
+			}
+		}
+	}
 }
 
 void ContextFreeGrammar::getFileLine(const std::string &fileName){

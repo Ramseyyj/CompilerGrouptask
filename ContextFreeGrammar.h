@@ -38,7 +38,7 @@ public:
 	void clearDirectLeftRecursion(const std::string &);
 	void clearAllLeftRecursion();
 	void ContextFreeGrammar::pickPublicLeftFactor();
-
+	void ContextFreeGrammar::simplify();
 	void getLine(const std::string &);
 
     //从文件读取
