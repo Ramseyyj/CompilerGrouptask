@@ -12,7 +12,6 @@
 #include <fstream>
 using namespace std;
 
-
 void printStr(const unordered_set<string> &test_set,const int flag){
     if (flag==1) {
         cout << "nterminal string is :" << endl;
@@ -34,7 +33,6 @@ void printProdcution(const string &str, const unordered_set<string> &test_prdtio
 	cout<<endl;
 }
 
-
 int main()
 {
     ContextFreeGrammar test_ContextFreeGrammar;
@@ -43,7 +41,7 @@ int main()
     unordered_set<string> test_nterminalStr;
     
     
-    test_ContextFreeGrammar.getFileLine("F:\\programming\\compiler\\CompilerGrouptask\\CompilerGrouptask\\test_ContextFreeGrammar4.2.txt");
+    test_ContextFreeGrammar.getFileLine("F:\\programming\\compiler\\CompilerGrouptask\\CompilerGrouptask\\test_ContextFreeGrammar4.3.txt");
 	test_nterminalStr = test_ContextFreeGrammar.getAllNTerminalStr();
     test_terminalStr = test_ContextFreeGrammar.getAllTerminalStr();
 
@@ -72,7 +70,7 @@ int main()
 
 	//测试消除左递归的程序
 	cout<<"消除左递归后的文法如下："<<endl;
-	test_ContextFreeGrammar.clearLeftRecursion();
+	test_ContextFreeGrammar.clearAllLeftRecuision();
     test_nterminalStr = test_ContextFreeGrammar.getAllNTerminalStr();
     test_terminalStr = test_ContextFreeGrammar.getAllTerminalStr();
     printStr(test_nterminalStr, 1);

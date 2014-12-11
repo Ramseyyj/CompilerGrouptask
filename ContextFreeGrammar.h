@@ -27,13 +27,16 @@ public:
     std::unordered_set<std::string> getProductionRhStr(const std::string &) const;
     std::unordered_set<std::string> getAllTerminalStr() const;
     std::unordered_set<std::string> getAllNTerminalStr() const;
+	std::unordered_set<std::string> getFirstSet(const std::string &) const;
+	std::unordered_set<std::string> getFollowSet(const std::string &) const;
     std::string getStartStr() const;
     
     bool isTerminalStr(const std::string &) const;
 
 	//判断一个产生式中是否含有左递归的函数
 	bool isLeftRecursion(const std::string &, const std::string &) const;
-	void clearLeftRecursion();
+	void clearDirectLeftRecursion(const std::string &);
+	void clearAllLeftRecuision();
 	void ContextFreeGrammar::pickPublicLeftFactor();
 
 	void getLine(const std::string &);
