@@ -132,7 +132,7 @@ void ContextFreeGrammar::clearDirectLeftRecursion(const std::string &lhStr) {
 	b.clear();
 }
 
-void ContextFreeGrammar::clearAllLeftRecuision(){
+void ContextFreeGrammar::clearAllLeftRecursion(){
 	int i,j;
 	bool flog;
 	std::string mterminalStr;//just one terminal or nterminal

@@ -36,7 +36,7 @@ public:
 	//判断一个产生式中是否含有左递归的函数
 	bool isLeftRecursion(const std::string &, const std::string &) const;
 	void clearDirectLeftRecursion(const std::string &);
-	void clearAllLeftRecuision();
+	void clearAllLeftRecursion();
 	void ContextFreeGrammar::pickPublicLeftFactor();
 
 	void getLine(const std::string &);

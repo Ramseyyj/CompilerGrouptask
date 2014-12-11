@@ -70,7 +70,7 @@ int main()
 
 	//测试消除左递归的程序
 	cout<<"消除左递归后的文法如下："<<endl;
-	test_ContextFreeGrammar.clearAllLeftRecuision();
+	test_ContextFreeGrammar.clearAllLeftRecursion();
     test_nterminalStr = test_ContextFreeGrammar.getAllNTerminalStr();
     test_terminalStr = test_ContextFreeGrammar.getAllTerminalStr();
     printStr(test_nterminalStr, 1);
