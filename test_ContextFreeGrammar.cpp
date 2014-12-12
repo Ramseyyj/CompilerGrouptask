@@ -65,17 +65,7 @@ int main()
 	for( auto ptr = test_nterminalStr.cbegin(); ptr!=test_nterminalStr.cend(); ++ptr) {
         printProdcution(*ptr,test_ContextFreeGrammar.getProductionRhStr(*ptr));
     }
-	test_ContextFreeGrammar.calFirstSet();
-	for( auto ptr = test_nterminalStr.cbegin(); ptr!=test_nterminalStr.cend(); ++ptr) {
-        cout<<*ptr<<" ";
-		printStr(test_ContextFreeGrammar.getFirstSet(*ptr),2);
-    }
-
-	test_ContextFreeGrammar.calFollowSet();
-	for( auto ptr = test_nterminalStr.cbegin(); ptr!=test_nterminalStr.cend(); ++ptr) {
-        cout<<*ptr<<" ";
-		printStr(test_ContextFreeGrammar.getFollowSet(*ptr),3);
-    }
+	
 
 
 	cout<<"转换为LL(1)后的文法如下："<<endl;
@@ -103,5 +93,16 @@ int main()
         printProdcution(*ptr,test_ContextFreeGrammar.getProductionRhStr(*ptr));
     }
 	
+	test_ContextFreeGrammar.calFirstSet();
+	for( auto ptr = test_nterminalStr.cbegin(); ptr!=test_nterminalStr.cend(); ++ptr) {
+        cout<<*ptr<<" ";
+		printStr(test_ContextFreeGrammar.getFirstSet(*ptr),2);
+    }
+
+	test_ContextFreeGrammar.calFollowSet();
+	for( auto ptr = test_nterminalStr.cbegin(); ptr!=test_nterminalStr.cend(); ++ptr) {
+        cout<<*ptr<<" ";
+		printStr(test_ContextFreeGrammar.getFollowSet(*ptr),3);
+    }
 	return 0;
 }
