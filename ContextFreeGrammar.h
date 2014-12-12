@@ -27,11 +27,14 @@ public:
     std::unordered_set<std::string> getProductionRhStr(const std::string &) const;
     std::unordered_set<std::string> getAllTerminalStr() const;
     std::unordered_set<std::string> getAllNTerminalStr() const;
+	void ContextFreeGrammar::calFirstSet();
+	void ContextFreeGrammar::calFollowSet();
 	std::unordered_set<std::string> getFirstSet(const std::string &) const;
 	std::unordered_set<std::string> getFollowSet(const std::string &) const;
     std::string getStartStr() const;
     
     bool isTerminalStr(const std::string &) const;
+	bool isContain$(const std::string &) const;
 
 	//判断一个产生式中是否含有左递归的函数
 	bool isLeftRecursion(const std::string &, const std::string &) const;
@@ -51,7 +54,8 @@ private:
     std::unordered_set<std::string> terminalStr;    //终结符
     std::unordered_set<std::string> nterminalStr;   //非终结符
     std::map<std::string,std::vector<std::string>> production;  //产生式
-    
+    std::map<std::string,std::unordered_set<std::string>> first;//FIRST集
+	std::map<std::string,std::unordered_set<std::string>> follow;//FOLLOW集
 };
 
 inline std::unordered_set<std::string> ContextFreeGrammar::getAllTerminalStr() const{
@@ -60,6 +64,14 @@ inline std::unordered_set<std::string> ContextFreeGrammar::getAllTerminalStr() c
 
 inline std::unordered_set<std::string> ContextFreeGrammar::getAllNTerminalStr() const{
     return nterminalStr;
+}
+
+inline std::unordered_set<std::string> ContextFreeGrammar::getFirstSet(const std::string &Str) const{
+	return first.at(Str);
+}
+
+inline std::unordered_set<std::string> ContextFreeGrammar::getFollowSet(const std::string &Str) const{
+	return follow.at(Str);
 }
 
 inline void ContextFreeGrammar::setStartStr(const std::string &str){

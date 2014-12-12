@@ -27,14 +27,55 @@ std::unordered_set<std::string> ContextFreeGrammar::getProductionRhStr(const std
     return  result;
 }
 
-std::unordered_set<std::string> ContextFreeGrammar::getFirstSet(const std::string &lhStr) const{
-	std::unordered_set<std::string> FIRST;
-	return FIRST;
+void ContextFreeGrammar::calFirstSet(){
+	std::string mterminalStr;
+	int i;
+	bool isBigger=true; //判断遍历一遍所有产生式后各个非终极符的First集有没有变大，有则值为true，否则值为false
+
+	for(auto ptr=terminalStr.cbegin();ptr!=terminalStr.cend();++ptr){//所有终结符的first集为本身
+		first[*ptr].insert(*ptr);
+	}
+
+	while(isBigger){//循环利用求FIRST集的规则直至每个FIRST集都不再变大为止
+		isBigger=false;
+		for(auto ptri=nterminalStr.cbegin();ptri!=nterminalStr.cend();++ptri){
+			for(auto ptrj=production.at(*ptri).cbegin();ptrj!=production.at(*ptri).cend();++ptrj){
+				i=0;
+		       	//在ptri对应非终极符的产生式右侧寻找可替代项
+		      	while( ((*ptrj)[i+1]=='\'')||((*ptrj)[i+1]=='^') ){
+				    mterminalStr.push_back((*ptrj)[i]);
+			    	i++;
+		     	}
+		    	mterminalStr.push_back((*ptrj)[i]);	
+		    	if(terminalStr.find(mterminalStr)!=terminalStr.end()){
+					if(first[*ptri].find(mterminalStr)==first[*ptri].end()){
+						first[*ptri].insert(mterminalStr);
+						isBigger=true;
+					}
+		    	}
+		    	else if(nterminalStr.find(mterminalStr)!=nterminalStr.end()){
+		     		for(auto ptr=first[mterminalStr].cbegin();ptr!=first[mterminalStr].cend();++ptr){
+			    		if( ((*ptr)[0]!='$')&&(first[*ptri].find(*ptr)==first[*ptri].end()) ){
+			    			first[*ptri].insert(*ptr);
+							isBigger=true;
+			    		}
+			    	}
+			    }
+				mterminalStr.clear();
+	    	}		
+    	}
+	}
 }
 
-std::unordered_set<std::string> ContextFreeGrammar::getFollowSet(const std::string &lhStr) const{
-	std::unordered_set<std::string> FOLLOW;
-	return FOLLOW;
+void ContextFreeGrammar::calFollowSet(){
+	bool isBigger=true;//判断遍历一遍所有产生式后各个非终极符的FOLLOW集有没有变大，有则值为true，否则值为false
+	
+	follow[getStartStr()].insert("#");//对于文法的开始符，置#于FOLLOW集中
+
+	while(isBigger){
+		isBigger=false;
+
+	}
 }
 
 bool ContextFreeGrammar::isTerminalStr(const std::string &tempStr) const{
@@ -42,6 +83,15 @@ bool ContextFreeGrammar::isTerminalStr(const std::string &tempStr) const{
         return false;
     }
     return true;
+}
+
+bool ContextFreeGrammar::isContain$(const std::string &lhStr) const{
+	bool flog=false;
+	for(auto ptr=production.at(lhStr).cbegin();ptr!=production.at(lhStr).cend();++ptr){
+		if((*ptr)[0]=='$')
+			flog=true;
+	}
+	return flog;
 }
 
 bool ContextFreeGrammar::isLeftRecursion(const std::string &lhProduction,const std::string &rhProduction) const{
@@ -186,8 +236,8 @@ void ContextFreeGrammar::clearAllLeftRecursion(){
 				}
 				tempVector.clear();
 			}
-			clearDirectLeftRecursion(*ptri);
 		}
+		clearDirectLeftRecursion(*ptri);
 	}
 }
 
