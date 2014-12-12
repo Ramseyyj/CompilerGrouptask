@@ -34,6 +34,8 @@ public:
     std::string getStartStr() const;
     
     bool isTerminalStr(const std::string &) const;
+
+	//判断一个非终极符的产生式右侧是否包含$项
 	bool isContain$(const std::string &) const;
 
 	//判断一个产生式中是否含有左递归的函数
@@ -42,7 +44,7 @@ public:
 	void clearAllLeftRecursion();
 	void ContextFreeGrammar::pickPublicLeftFactor();
 	void ContextFreeGrammar::simplify();
-	void getLine(const std::string &);
+	void getLine(const std::string &,const int &);
 
     //从文件读取
     void getFileLine(const std::string &);

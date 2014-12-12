@@ -41,7 +41,6 @@ void ContextFreeGrammar::calFirstSet(){
 		for(auto ptri=nterminalStr.cbegin();ptri!=nterminalStr.cend();++ptri){
 			for(auto ptrj=production.at(*ptri).cbegin();ptrj!=production.at(*ptri).cend();++ptrj){
 				i=0;
-		       	//在ptri对应非终极符的产生式右侧寻找可替代项
 		      	while( ((*ptrj)[i+1]=='\'')||((*ptrj)[i+1]=='^') ){
 				    mterminalStr.push_back((*ptrj)[i]);
 			    	i++;
@@ -68,13 +67,75 @@ void ContextFreeGrammar::calFirstSet(){
 }
 
 void ContextFreeGrammar::calFollowSet(){
+	int i;
 	bool isBigger=true;//判断遍历一遍所有产生式后各个非终极符的FOLLOW集有没有变大，有则值为true，否则值为false
-	
+	std::string mterminalStrNow;//用于记录项中当前的处理对象（终结符或非终极符）
+	std::string mterminalStrNext;//用于记录项中前一个处理对象（终结符或非终极符）
+
 	follow[getStartStr()].insert("#");//对于文法的开始符，置#于FOLLOW集中
-
-	while(isBigger){
+	
+	while(isBigger){//循环利用求FOLLOW集的规则直至每个FOLLOW集都不再变大为止
 		isBigger=false;
+		for(auto ptri=nterminalStr.cbegin();ptri!=nterminalStr.cend();++ptri){
+			for(auto ptrj=production.at(*ptri).cbegin();ptrj!=production.at(*ptri).cend();++ptrj){
+				if((*ptrj)=="$")
+					continue;
+				i=0;
+				while( ((*ptrj)[i+1]=='\'')||((*ptrj)[i+1]=='^') ){
+					mterminalStrNow.push_back((*ptrj)[i]);
+					i++;
+				}
+				mterminalStrNow.push_back((*ptrj)[i]);	//先取出第一个终结符或非终极符放入mterminalStrNow
+				i++;
+				while(i<(*ptrj).length()){//遍历产生式右侧的一个项
+					if(terminalStr.find(mterminalStrNow)!=terminalStr.end()){//如果当前的为终结符，直接跳到下一个
+						mterminalStrNow.clear();
+						while( ((*ptrj)[i+1]=='\'')||((*ptrj)[i+1]=='^') ){
+				         	mterminalStrNow.push_back((*ptrj)[i]);
+				         	i++;
+						}
+			        	mterminalStrNow.push_back((*ptrj)[i]);
+						i++;
+						continue;
+					}
 
+					while( ((*ptrj)[i+1]=='\'')||((*ptrj)[i+1]=='^') ){
+				       	mterminalStrNext.push_back((*ptrj)[i]);
+				       	i++;
+			    	}
+			       	mterminalStrNext.push_back((*ptrj)[i]);	//取出项中的下一个终结符或非终极符放入mterminalStrNext
+					i++;
+
+					for(auto ptr=first[mterminalStrNext].cbegin();ptr!=first[mterminalStrNext].cend();++ptr){
+						if( ((*ptr)[0]!='$')&&(follow[mterminalStrNow].find(*ptr)==follow[mterminalStrNow].end()) ){
+							follow[mterminalStrNow].insert(*ptr);
+							isBigger=true;
+						}
+					}
+					if( (nterminalStr.find(mterminalStrNext)!=nterminalStr.end())&&(isContain$(mterminalStrNext)) ){//如果下一个是非终极符且能推出$
+						for (auto ptr=follow[*ptri].cbegin();ptr!=follow[*ptri].cend();++ptr){
+					    	if(follow[mterminalStrNow].find(*ptr)==follow[mterminalStrNow].end()){
+					    		follow[mterminalStrNow].insert(*ptr);
+					    		isBigger=true;
+					    	}
+						}
+					}
+					
+					mterminalStrNow.clear();
+					mterminalStrNow=mterminalStrNext;
+				}
+				if(nterminalStr.find(mterminalStrNext)!=nterminalStr.end()){
+					for (auto ptr=follow[*ptri].cbegin();ptr!=follow[*ptri].cend();++ptr){
+						if(follow[mterminalStrNext].find(*ptr)==follow[mterminalStrNext].end()){
+							follow[mterminalStrNext].insert(*ptr);
+							isBigger=true;
+						}
+					}
+				}
+			}
+			mterminalStrNow.clear();
+			mterminalStrNext.clear();
+		}
 	}
 }
 
@@ -174,7 +235,7 @@ void ContextFreeGrammar::clearDirectLeftRecursion(const std::string &lhStr) {
 			clrProduction.push_back('|');
 		}
 		clrProduction.push_back('$');
-		getLine(clrProduction);
+		getLine(clrProduction,0);
 		clrProduction.clear();
 	}
 		
@@ -304,7 +365,7 @@ void ContextFreeGrammar::pickPublicLeftFactor(){
 					pplfProduction.push_back('|');
 				}
 			}
-			getLine(pplfProduction);
+			getLine(pplfProduction,0);
 			pplfProduction.clear();
 		}
 		
@@ -356,6 +417,7 @@ void ContextFreeGrammar::simplify(){
 }
 
 void ContextFreeGrammar::getFileLine(const std::string &fileName){
+	int line=0;//用来记录当前读取的是文法的第几个产生式，为后面设定开始符做依据
     std::fstream input;
     input.open(fileName);
     
@@ -369,13 +431,14 @@ void ContextFreeGrammar::getFileLine(const std::string &fileName){
         std::string rawProduction;  //raw line in the file       
             
         std::getline(input, rawProduction, '\n');
-		getLine(rawProduction);
+		line++;
+		getLine(rawProduction,line);
     }
     
     input.close();
 }
 
-void ContextFreeGrammar::getLine(const std::string &raw_Production){
+void ContextFreeGrammar::getLine(const std::string &raw_Production,const int &line){
 	std::string rawProduction;  //raw line in the file
 	std::string rhProduction;
     std::string lhProduction; //left hand of the production
@@ -394,6 +457,9 @@ void ContextFreeGrammar::getLine(const std::string &raw_Production){
 		lhProduction.push_back(rawProduction[i++]);
 	}
         
+	if(line==1){
+		setStartStr(lhProduction);
+	}
 	//remove the string initial in terminalStr
 	if (terminalStr.find(lhProduction)!=terminalStr.end()) {
 		terminalStr.erase(lhProduction);

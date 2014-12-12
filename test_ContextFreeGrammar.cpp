@@ -19,8 +19,11 @@ void printStr(const unordered_set<string> &test_set,const int flag){
     else if(flag==0){
         cout << "terminal string is :" << endl;
     }
-	else{
+	else if(flag==2){
 		cout <<"的FIRST集：";
+	}
+	else if(flag==3){
+		cout <<"的FOLLOW集：";
 	}
     
     for (auto ptr = test_set.cbegin(); ptr!=test_set.cend(); ++ptr) {
@@ -67,6 +70,13 @@ int main()
         cout<<*ptr<<" ";
 		printStr(test_ContextFreeGrammar.getFirstSet(*ptr),2);
     }
+
+	test_ContextFreeGrammar.calFollowSet();
+	for( auto ptr = test_nterminalStr.cbegin(); ptr!=test_nterminalStr.cend(); ++ptr) {
+        cout<<*ptr<<" ";
+		printStr(test_ContextFreeGrammar.getFollowSet(*ptr),3);
+    }
+
 
 	cout<<"转换为LL(1)后的文法如下："<<endl;
 	//测试消除左递归的程序
