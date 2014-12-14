@@ -139,6 +139,50 @@ void ContextFreeGrammar::calFollowSet(){
 	}
 }
 
+void ContextFreeGrammar::calPredictionTable(){
+	int i;
+	std::string mterminalStr;
+	PredictionTable_coordinate coord;
+
+	for(auto ptri=nterminalStr.cbegin();ptri!=nterminalStr.cend();++ptri){
+		for(auto ptrj=terminalStr.cbegin();ptrj!=terminalStr.cend();++ptrj){
+			coord.A=*ptri;
+			coord.a=*ptrj;
+			predictiontable[coord]="error";
+		}
+		coord.A=*ptri;
+		coord.a="#";
+		predictiontable[coord]="error";
+	}
+
+	for(auto ptri=nterminalStr.cbegin();ptri!=nterminalStr.cend();++ptri){
+		for(auto ptrj=production.at(*ptri).cbegin();ptrj!=production.at(*ptri).cend();++ptrj){
+			i=0;
+		   	while( ((*ptrj)[i+1]=='\'')||((*ptrj)[i+1]=='^') ){
+	     	    mterminalStr.push_back((*ptrj)[i]);
+			   	i++;
+		   	}
+		   	mterminalStr.push_back((*ptrj)[i]);	
+
+			for(auto ptr=first[mterminalStr].cbegin();ptr!=first[mterminalStr].cend();++ptr){
+				if((*ptr)=="$"){
+					for(auto ptrb=follow[*ptri].cbegin();ptrb!=follow[*ptri].cend();++ptrb){
+						coord.A=*ptri;
+						coord.a=*ptrb;
+						predictiontable[coord]=*ptrj;
+					}
+				}
+				else{
+					coord.A=*ptri;
+					coord.a=*ptr;
+					predictiontable[coord]=*ptrj;
+				}
+			}
+			mterminalStr.clear();
+		}
+	}
+}
+
 bool ContextFreeGrammar::isTerminalStr(const std::string &tempStr) const{
     if (terminalStr.find(tempStr) == terminalStr.end()) {
         return false;

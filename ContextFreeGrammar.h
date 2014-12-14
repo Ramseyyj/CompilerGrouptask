@@ -15,6 +15,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include "PredictionTable_Coordinate.h"
 
 class ContextFreeGrammar
 {
@@ -29,8 +30,10 @@ public:
     std::unordered_set<std::string> getAllNTerminalStr() const;
 	void ContextFreeGrammar::calFirstSet();
 	void ContextFreeGrammar::calFollowSet();
+	void ContextFreeGrammar::calPredictionTable();
 	std::unordered_set<std::string> getFirstSet(const std::string &) const;
 	std::unordered_set<std::string> getFollowSet(const std::string &) const;
+	std::string getPredictionTable(const PredictionTable_coordinate &) const;
     std::string getStartStr() const;
     
     bool isTerminalStr(const std::string &) const;
@@ -58,6 +61,7 @@ private:
     std::map<std::string,std::vector<std::string>> production;  //产生式
     std::map<std::string,std::unordered_set<std::string>> first;//FIRST集
 	std::map<std::string,std::unordered_set<std::string>> follow;//FOLLOW集
+	std::map<PredictionTable_coordinate,std::string> predictiontable;//预测分析表
 };
 
 inline std::unordered_set<std::string> ContextFreeGrammar::getAllTerminalStr() const{
@@ -74,6 +78,10 @@ inline std::unordered_set<std::string> ContextFreeGrammar::getFirstSet(const std
 
 inline std::unordered_set<std::string> ContextFreeGrammar::getFollowSet(const std::string &Str) const{
 	return follow.at(Str);
+}
+
+inline std::string ContextFreeGrammar::getPredictionTable(const PredictionTable_coordinate &coord) const{
+	return predictiontable.at(coord);
 }
 
 inline void ContextFreeGrammar::setStartStr(const std::string &str){
