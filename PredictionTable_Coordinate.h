@@ -9,6 +9,7 @@ struct PredictionTable_coordinate
 	
 };
 
+//对<进行重载从而使这个结构体可以作为map的键值
 inline bool operator < (const PredictionTable_coordinate &ls,const PredictionTable_coordinate &rs) {
 		return (ls.A < rs.A || (ls.A == rs.A && ls.a < rs.a));
 	}

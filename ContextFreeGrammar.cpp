@@ -6,8 +6,10 @@
 //  Copyright (c) 2014 lms. All rights reserved.
 //
 
+#include <iomanip>
 #include <fstream>
 #include <algorithm>
+#include <stack>
 #include "ContextFreeGrammar.h"
 
 void ContextFreeGrammar::addTerminalStr(const std::string &newTerminalStr){
@@ -183,6 +185,119 @@ void ContextFreeGrammar::calPredictionTable(){
 	}
 }
 
+void ContextFreeGrammar::analysisSentenceByPredictionTable(const std::string &sentence){
+	int i=0,j,step=0;
+	bool flag,isPro;
+	PredictionTable_coordinate coord;
+	std::stack<std::string> tempStack;
+	std::stack<std::string> STACK;
+	std::string tempTop;
+	std::string tempStr;
+	std::string tempPro;//用于记录分析所用的产生式
+	std::string sentenceNow;//当前输入符号
+	std::string stackTop;//STACK栈顶元素
+
+	STACK.push("#");
+	STACK.push(getStartStr());//首先把#和文法的开始符压入STACK栈
+
+	while( (sentence[i+1]=='\'')||(sentence[i+1]=='^') ){
+		sentenceNow.push_back(sentence[i]);
+	   	i++;	
+	}
+	sentenceNow.push_back(sentence[i++]);//把第一个输入符号读进sentenceNow
+
+	std::cout<<std::setw(5)<<std::left<<"step"<<std::setw(15)<<std::left<<"STACK";
+	std::cout<<std::setw(10)<<std::right<<"sentence"<<"    "<<std::setw(20)<<std::left<<"used production"<<std::endl;
+	std::cout<<"========================================================"<<std::endl;
+	flag=true;
+	isPro=false;
+	while (flag) {
+		std::cout<<std::setw(5)<<std::left<<step++;
+		
+		while(!STACK.empty()){//把STACK中的元素暂时移至tempStack中用于输出STACK栈
+			tempTop=STACK.top();
+			tempStack.push(tempTop);
+			STACK.pop();
+		}
+		while(!tempStack.empty()){
+			tempTop=tempStack.top();
+			tempStr=tempStr+tempTop;
+			STACK.push(tempTop);
+			tempStack.pop();
+		}
+		std::cout<<std::setw(15)<<std::left<<tempStr;
+		tempStr.clear();
+		tempStr=tempStr+sentenceNow;
+		for(auto k=i;k<sentence.length();++k){
+			tempStr=tempStr+sentence[k];
+		}
+		std::cout<<std::setw(10)<<std::right<<tempStr;
+		tempStr.clear();
+
+		if(isPro){
+			std::cout<<"    "<<std::setw(20)<<std::left<<tempPro;
+		}
+		std::cout<<std::endl;
+
+		stackTop=STACK.top();
+		coord.A=stackTop;
+		coord.a=sentenceNow;
+		isPro=false;
+		if( terminalStr.find(stackTop)!=terminalStr.end() ){//如果栈顶元素为终结符
+			if(stackTop==sentenceNow){//如果栈顶元素和当前输入符号相同，读入下一个输入符号				
+				sentenceNow.clear();
+				while( (sentence[i+1]=='\'')||(sentence[i+1]=='^') ){
+					sentenceNow.push_back(sentence[i]);
+					i++;	
+				}
+				sentenceNow.push_back(sentence[i++]);
+				STACK.pop();
+			}
+			else{
+				std::cout<<"error1";
+				break;
+			}
+		}
+		else if(stackTop=="#"){
+			if(stackTop==sentenceNow){//分析结束
+				flag=false;
+			}
+			else{
+				std::cout<<"error2";
+				break;
+			}
+		}
+		else if(predictiontable[coord]!="error"){
+			tempPro=coord.A+"->"+predictiontable[coord];
+			STACK.pop();
+			isPro=true;
+			if(predictiontable[coord]!="$"){
+				j=0;
+				while(j<predictiontable[coord].length()){
+					while( (predictiontable[coord][j+1]=='\'')||(predictiontable[coord][j+1]=='^') ){
+		   		    	tempStr.push_back(predictiontable[coord][j]);
+				    	j++;	
+			    	}
+			    	tempStr.push_back(predictiontable[coord][j++]);
+					tempStack.push(tempStr);
+					tempStr.clear();
+				}
+				while(!tempStack.empty()){//把产生式右侧项中的每一个终结符或非终极符倒序压入STACK栈中
+					tempTop=tempStack.top();
+					STACK.push(tempTop);
+					tempStack.pop();
+				}
+			}
+		}
+		else{
+			std::cout<<"error3";
+			break;
+		}
+	}
+
+
+}
+
 bool ContextFreeGrammar::isTerminalStr(const std::string &tempStr) const{
     if (terminalStr.find(tempStr) == terminalStr.end()) {
         return false;
@@ -191,12 +306,12 @@ bool ContextFreeGrammar::isTerminalStr(const std::string &tempStr) const{
 }
 
 bool ContextFreeGrammar::isContain$(const std::string &lhStr) const{
-	bool flog=false;
+	bool flag=false;
 	for(auto ptr=production.at(lhStr).cbegin();ptr!=production.at(lhStr).cend();++ptr){
 		if((*ptr)[0]=='$')
-			flog=true;
+			flag=true;
 	}
-	return flog;
+	return flag;
 }
 
 bool ContextFreeGrammar::isLeftRecursion(const std::string &lhProduction,const std::string &rhProduction) const{
@@ -421,13 +536,13 @@ void ContextFreeGrammar::pickPublicLeftFactor(){
 void ContextFreeGrammar::simplify(){
 	std::string mterminalStr;
 	int i;
-	bool flog;//用于记录当前非终极符是否多余，如果是值为true，否则为false
+	bool flag;//用于记录当前非终极符是否多余，如果是值为true，否则为false
 	bool isDelete=true;//用于记录一次循环中有没有删除非终极符，如果删除了值为true,否则为false
 
 	while(isDelete){
 		isDelete=false;
 		for (auto ptri= nterminalStr.begin();ptri!=nterminalStr.end();++ptri){
-			flog=true;
+			flag=true;
 			for(auto ptrj=nterminalStr.cbegin();ptrj!=nterminalStr.cend();++ptrj){
 				for (auto ptr=production.at(*ptrj).begin();ptr!=production.at(*ptrj).end();++ptr){
 					i=0;
@@ -440,18 +555,18 @@ void ContextFreeGrammar::simplify(){
 							mterminalStr.push_back((*ptr)[i]);	
 						}
 						if(mterminalStr == *ptri){
-							flog=false;
+							flag=false;
 							break;
 						}
 						i++;
 					}
-					if(!flog)
+					if(!flag)
 						break;
 				}
-				if(!flog)
+				if(!flag)
 					break;
 			}
-			if(flog && (*ptri)!=getStartStr()){
+			if(flag && (*ptri)!=getStartStr()){
 				nterminalStr.erase(ptri);
 				isDelete=true;
 				break;

@@ -28,9 +28,12 @@ public:
     std::unordered_set<std::string> getProductionRhStr(const std::string &) const;
     std::unordered_set<std::string> getAllTerminalStr() const;
     std::unordered_set<std::string> getAllNTerminalStr() const;
-	void ContextFreeGrammar::calFirstSet();
-	void ContextFreeGrammar::calFollowSet();
-	void ContextFreeGrammar::calPredictionTable();
+
+	void calFirstSet();
+	void calFollowSet();
+	void calPredictionTable();
+	void analysisSentenceByPredictionTable(const std::string &);
+
 	std::unordered_set<std::string> getFirstSet(const std::string &) const;
 	std::unordered_set<std::string> getFollowSet(const std::string &) const;
 	std::string getPredictionTable(const PredictionTable_coordinate &) const;
@@ -50,9 +53,7 @@ public:
 	void getLine(const std::string &,const int &);
 
     //从文件读取
-    void getFileLine(const std::string &);
-
-	
+    void getFileLine(const std::string &);	
 
 private:
     std::string startStr;

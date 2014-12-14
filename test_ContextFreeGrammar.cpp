@@ -42,6 +42,7 @@ void printProdcution(const string &str, const unordered_set<string> &test_prdtio
 
 int main()
 {
+	string sentence;
 	PredictionTable_coordinate coord;
 	string test_file;
     ContextFreeGrammar test_ContextFreeGrammar;
@@ -109,7 +110,7 @@ int main()
 	//构造预测分析表的过程
 	test_ContextFreeGrammar.calPredictionTable();
 	//输出预测分析表
-	/*for(auto ptri=test_nterminalStr.cbegin();ptri!=test_nterminalStr.cend();++ptri){
+	for(auto ptri=test_nterminalStr.cbegin();ptri!=test_nterminalStr.cend();++ptri){
 		for(auto ptrj=test_terminalStr.cbegin();ptrj!=test_terminalStr.cend();++ptrj){
 			if( (*ptrj)[0]!='$' ){
 				coord.A=*ptri;
@@ -120,9 +121,13 @@ int main()
 		coord.A=*ptri;
 		coord.a="#";
 		cout<<"M["<<*ptri<<",#]="<<test_ContextFreeGrammar.getPredictionTable(coord)<<endl;
-	}*/
+	}
+	cout<<endl;
 
-	
+	cout<<"请输入想要进行预测分析的句型:";
+	cin>>sentence;
+	sentence=sentence+"#";
+	test_ContextFreeGrammar.analysisSentenceByPredictionTable(sentence);
 
 	return 0;
 }
