@@ -47,20 +47,46 @@ void ContextFreeGrammar::calFirstSet(){
 				    mterminalStr.push_back((*ptrj)[i]);
 			    	i++;
 		     	}
-		    	mterminalStr.push_back((*ptrj)[i]);	
-		    	if(terminalStr.find(mterminalStr)!=terminalStr.end()){
+		    	mterminalStr.push_back((*ptrj)[i++]);	
+
+		    	if(terminalStr.find(mterminalStr)!=terminalStr.end()){//如果右侧项中第一个为终结符
 					if(first[*ptri].find(mterminalStr)==first[*ptri].end()){
 						first[*ptri].insert(mterminalStr);
 						isBigger=true;
 					}
 		    	}
-		    	else if(nterminalStr.find(mterminalStr)!=nterminalStr.end()){
+		    	else if(nterminalStr.find(mterminalStr)!=nterminalStr.end()){//如果右侧项中第一个为非终极符
 		     		for(auto ptr=first[mterminalStr].cbegin();ptr!=first[mterminalStr].cend();++ptr){
 			    		if( ((*ptr)[0]!='$')&&(first[*ptri].find(*ptr)==first[*ptri].end()) ){
 			    			first[*ptri].insert(*ptr);
 							isBigger=true;
 			    		}
 			    	}
+
+					while( (i<(*ptrj).length())&&isContain$(mterminalStr) ){//处理项中前面都是非终极符且都能推出$的情况
+						if(i<(*ptrj).length()){
+					    	mterminalStr.clear();
+				        	while( ((*ptrj)[i+1]=='\'')||((*ptrj)[i+1]=='^') ){
+			             	    mterminalStr.push_back((*ptrj)[i]);
+			                	i++;
+		                	}
+		                	mterminalStr.push_back((*ptrj)[i++]);
+    
+					    	if(nterminalStr.find(mterminalStr)!=nterminalStr.end()){
+					     		for(auto ptr=first[mterminalStr].cbegin();ptr!=first[mterminalStr].cend();++ptr){
+			    	            	if( ((*ptr)[0]!='$')&&(first[*ptri].find(*ptr)==first[*ptri].end()) ){
+			    	            		first[*ptri].insert(*ptr);
+					            		isBigger=true;
+			    	            	}
+			                 	}
+				    		}
+						}
+		    		}
+					if( (i=(*ptrj).length())&&(first[*ptri].find("$")==first[*ptri].end()) ){
+						first[*ptri].insert("$");
+						isBigger=true;
+					}
+
 			    }
 				mterminalStr.clear();
 	    	}		
@@ -101,6 +127,7 @@ void ContextFreeGrammar::calFollowSet(){
 						continue;
 					}
 
+					mterminalStrNext.clear();
 					while( ((*ptrj)[i+1]=='\'')||((*ptrj)[i+1]=='^') ){
 				       	mterminalStrNext.push_back((*ptrj)[i]);
 				       	i++;

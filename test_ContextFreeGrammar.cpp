@@ -106,7 +106,7 @@ int main()
         cout<<*ptr<<" ";
 		printStr(test_ContextFreeGrammar.getFollowSet(*ptr),3);
     }
-
+	/*
 	//构造预测分析表的过程
 	test_ContextFreeGrammar.calPredictionTable();
 	//输出预测分析表
@@ -128,6 +128,7 @@ int main()
 	cin>>sentence;
 	sentence=sentence+"#";
 	test_ContextFreeGrammar.analysisSentenceByPredictionTable(sentence);
+	*/
 
 	return 0;
 }
